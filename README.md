@@ -1,98 +1,161 @@
-# Conway's Game of Life Explorer
+# Glasscube Algorithm Visualizer
 
-![Conway's Game of Life Explorer](https://conway.glasscube.io)
+An interactive algorithm visualizer SPA built with React 19, Vite, TypeScript, Tailwind CSS v4, and Framer Motion. Step through 19 algorithms with smooth frame-by-frame animations, synchronized code highlighting in TypeScript, Rust, and Java, and interactive controls.
 
-A beautiful, interactive implementation of Conway's Game of Life with both traditional square grid and hexagonal grid variants, built with React and Tailwind CSS.
-
-## 📸 Screenshots
-
-### Landing Page
-![Landing Page](/public/landing.png)
-*The landing page introduces users to Conway's Game of Life and provides navigation to different grid variants.*
-
-### Square Grid
-![Square Grid](/public/square.png)
-*The classic Conway's Game of Life implementation with a square grid.*
-
-### Hexagon Grid
-![Hexagon Grid](/public/hex.png)
-*A unique implementation of Conway's Game of Life using hexagonal cells.*
-
-## ⚡ Quick Installation
+## ⚡ Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/Turan-Nadir/conway.git
-cd conway
-
-# Install dependencies
+git clone https://github.com/glasscubeio/algorithms.git
+cd algorithms
 bun install
-
-# Run development server
 bun run dev
-
-# Or build for production
-bun run build
 ```
 
-## 🧩 Page Descriptions
+## 🗂 Project Structure
 
-### Landing Page (`Page.tsx`)
-The landing page serves as the entry point for the application, featuring:
-- A visually appealing hero section with the title "Conway's Game of Life"
-- Navigation buttons to the Hexagon and Square grid implementations
-- An informative section explaining the rules of Conway's Game of Life
-- A features section highlighting the different aspects of the application
-- A link to the GitHub repository
+```
+src/
+  App.tsx                                   # SPA root — active algo state, AnimatePresence
+  main.tsx                                  # Entry point (no router)
+  lib/
+    algos.ts                                # AlgoId union, Category types, ALGORITHMS registry
+    codeSnippets.ts                         # TS / Rust / Java code arrays per algorithm
+    utils.ts                                # cn() class helper
+  components/
+    CodeDisplay.tsx                         # Syntax-highlighted code with active-line tracking
+    ui/
+      button.tsx                            # Variant button (default/ghost/outline/danger)
+      badge.tsx                             # Variant badge (default/outline/success)
+  algorithms/
+    cellular-automata/
+      ConwaySquare.tsx                      # Conway — square grid, 8-neighbor
+      ConwayHex.tsx                         # Conway — hex-shaped SVG grid, axial coords
+    sorting/
+      frames.ts                             # SortFrame generators (5 algorithms)
+      SortingVisualizer.tsx                 # Shared bar-chart animation
+    graph/
+      traversalFrames.ts                    # BFS / DFS frame generators
+      GraphTraversal.tsx                    # Interactive grid visualizer
+      mstFrames.ts                          # Kruskal / Prim frame generators
+      MSTVisualizer.tsx                     # SVG graph MST visualizer
+    pathfinding/
+      pathfindingFrames.ts                  # Dijkstra / A* frame generators
+      PathfindingVisualizer.tsx             # Weighted grid pathfinding visualizer
+    dynamic-programming/
+      fibFrames.ts                          # Fibonacci DP frame generator
+      FibonacciDP.tsx                       # 1D memoization table visualizer
+      knapsackFrames.ts                     # 0/1 Knapsack frame generator
+      KnapsackDP.tsx                        # 2D DP table + items sidebar
+    backtracking/
+      nqueensFrames.ts                      # N-Queens backtracking frame generator
+      NQueens.tsx                           # Chessboard with backtrack animation
+    strings/
+      kmpFrames.ts                          # KMP failure table + search frames
+      KMPVisualizer.tsx                     # Text/pattern/failure-table display
+    data-structures/
+      bstFrames.ts                          # BST insert + search frame generator
+      BSTVisualizer.tsx                     # SVG tree diagram
+      heapFrames.ts                         # Max-heap build/insert/extract frames
+      HeapVisualizer.tsx                    # Array + tree dual view
+  views/
+    Landing.tsx                             # Algorithm cards grouped by category
+```
 
-The landing page is built with a responsive design using Tailwind CSS gradients, animations, and interactive elements that enhance the user experience.
+## 🎬 Algorithms (19 total)
 
-### Hexagon Grid (`Hexagon.tsx`)
-The Hexagon Grid page offers a unique twist on Conway's Game of Life by implementing it with hexagonal cells. Features include:
-- A responsive hexagonal grid that adapts to different screen sizes
-- Interactive controls (Play/Pause, Reset, Seed)
-- The ability to toggle individual cells by clicking
-- Smooth animations for cell state transitions
+### Cellular Automata
 
-The implementation uses the same Game of Life rules but adapts them for a six-neighbor topology, creating fascinating new patterns not possible in the classic version.
+| Algorithm | Grid | Neighbors | Notes |
+|-----------|------|-----------|-------|
+| Conway's Game of Life | Square | 8 (Moore) | Gap cells, large map, drag-draw |
+| Conway's Game of Life | Hexagonal SVG | 6 (axial) | Proper hex-shaped map, glow filter |
 
-### Square Grid (`Square.tsx`)
-The Square Grid page provides the traditional Conway's Game of Life experience with:
-- A classic square grid with responsive design
-- Interactive controls similar to the Hexagon version
-- The ability to create custom starting configurations
-- The original eight-neighbor rule implementation
+The hexagonal grid uses **axial coordinates** — valid cells satisfy `max(|q|, |r|, |q+r|) ≤ N` — producing 271 cells in a regular hexagon shape.
 
-This implementation allows for the creation of well-known patterns like gliders, blinkers, and spaceships.
+### Sorting
 
-## 🔍 Technical Implementation
+| Algorithm | Time | Space | Stable |
+|-----------|------|-------|--------|
+| Bubble Sort | O(n²) | O(1) | Yes |
+| Selection Sort | O(n²) | O(1) | No |
+| Insertion Sort | O(n²) | O(1) | Yes |
+| Merge Sort | O(n log n) | O(n) | Yes |
+| Quick Sort | O(n log n) avg | O(log n) | No |
 
-Both grid implementations share similar logic:
-- React state management for grid data and simulation controls
-- useEffect hooks for handling animation frames and responsive design
-- Custom algorithms for neighbor counting and rule application
-- Tailwind CSS for styling and responsive design
+Bar colors: Yellow = comparing · Red = swapping · Orange = pivot · Green = sorted
 
-The main difference lies in the cell geometry and neighbor calculation algorithms:
-- The Square grid uses 8 adjacent neighbors (orthogonal and diagonal)
-- The Hexagon grid uses a modified neighbor calculation suitable for hexagonal topology
+### Graph Traversal
 
-## 📱 Responsive Design
+| Algorithm | Time | Space | Notes |
+|-----------|------|-------|-------|
+| BFS | O(V + E) | O(V) | Queue; shortest path in unweighted graph |
+| DFS | O(V + E) | O(V) | Stack; explores deep before wide |
 
-The application is fully responsive and adapts to different screen sizes:
-- Grid size adjusts based on screen width
-- Cell size scales appropriately
-- UI controls reflow on smaller screens
-- Visual design remains consistent across devices
+Interactive grid with wall/start/end drawing, maze generator, step controls.
 
-## 📞 Contact
+### Pathfinding (weighted grid)
 
-For questions, suggestions, or contributions, please reach out:
+| Algorithm | Time | Space | Notes |
+|-----------|------|-------|-------|
+| Dijkstra | O((V+E) log V) | O(V) | Optimal weighted shortest path |
+| A* | O(E log V) | O(V) | Manhattan heuristic; faster than Dijkstra toward goal |
 
-- Website: [glasscube.io](https://glasscube.io)
-- Email: [robertbenn95@gmail.com](mailto:robertbenn95@gmail.com)
-- GitHub: [Link to Repository](https://github.com/Turan-Nadir/conway.git)
+Cells show edge weights (1–5). Visited cells show current best distance.
+
+### Minimum Spanning Tree (SVG graph, 10 nodes, 16 edges)
+
+| Algorithm | Time | Space | Notes |
+|-----------|------|-------|-------|
+| Kruskal | O(E log E) | O(V) | Sort edges + Union-Find cycle detection |
+| Prim | O(E log V) | O(V) | Grow tree greedily from node 0 |
+
+### Dynamic Programming
+
+| Algorithm | Time | Space | Notes |
+|-----------|------|-------|-------|
+| Fibonacci DP | O(n) | O(n) | 1D memoization table, selectable n |
+| 0/1 Knapsack | O(n·W) | O(n·W) | 2D table + items sidebar |
+
+### Backtracking
+
+| Algorithm | Time | Space | Notes |
+|-----------|------|-------|-------|
+| N-Queens | O(n!) | O(n) | Selectable N (4–8), pruning visible |
+
+### Strings
+
+| Algorithm | Time | Space | Notes |
+|-----------|------|-------|-------|
+| KMP | O(n + m) | O(m) | Failure table build phase then search phase |
+
+### Data Structures
+
+| Algorithm | Time | Space | Notes |
+|-----------|------|-------|-------|
+| Binary Search Tree | O(log n) avg | O(n) | Insert 11 nodes then search |
+| Max-Heap | O(log n) | O(1) | Build-heap, insert, extract-max; dual array+tree view |
+
+## 🖥 UI Features
+
+- **SPA** — no React Router; single `active: AlgoId | null` state in `App.tsx`
+- **Animated transitions** — Framer Motion `AnimatePresence` between views
+- **Code panel** — TypeScript / Rust / Java tabs, active line highlighted in yellow, auto-scrolls
+- **Speed presets** — Slow / Normal / Fast on every visualizer
+- **Step controls** — ← → buttons for frame-by-frame stepping
+- **Interactive grids** — drag-draw walls, randomize maze/weights
+
+## 🛠 Tech Stack
+
+| Tool | Version | Role |
+|------|---------|------|
+| React | 19 | UI |
+| TypeScript | 5 | Type safety (strict mode) |
+| Vite + SWC | 6 | Build & HMR |
+| Tailwind CSS | 4 | Styling |
+| Framer Motion | 12 | Animations |
+| Lucide React | latest | Icons |
+| Bun | latest | Package manager & runner |
 
 ## License
 
-This project is licensed under the MIT License.
+MIT
